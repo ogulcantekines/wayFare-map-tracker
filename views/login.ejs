@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 1. META & STYLES -->
+  <meta charset="UTF-8" />
+  <title>WayFare -Login-</title>
+   <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+   
+  <link rel="stylesheet" href="./styles/login.css" />
+</head>
+
+<body>
+
+  <!-- ============================================== -->
+  <!-- 1. LOGIN BOX -->
+  <!-- ============================================== -->
+  <div class="login-box">
+    <h1>Welcome to WayFare</h1>
+
+    <!-- Login Form -->
+    <form action="/login" method="POST">
+      <input type="text" name="username" placeholder="Enter Your Username" required />
+      <button type="submit" id="login-btn">Start the Game</button>
+    </form>
+
+    <!-- ============================================== -->
+    <!-- 2. ERROR TOAST MESSAGE (if login failed) -->
+    <!-- ============================================== -->
+    <% if (typeof error !== "undefined" && error !== null) { %>
+      <div class="toast"><%= error %></div>
+
+      <!-- ============================================== -->
+      <!-- 3. SCRIPT: Clean URL + Back Navigation Handling -->
+      <!-- ============================================== -->
+      <script>
+
+        // Clear "?error=1" from the URL after rendering the error
+        const url = new URL(window.location);
+        url.searchParams.delete("error");
+        window.history.replaceState({}, document.title, url);
+
+        // Handle back navigation to ensure reset
+        window.addEventListener("pageshow", function (event) {
+          if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+            window.location.href = "/";
+          }
+        });
+      </script>
+    <% } %>
+  </div>
+
+</body>
+</html>

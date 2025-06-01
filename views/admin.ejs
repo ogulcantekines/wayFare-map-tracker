@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- META & STYLE -->
+  <meta charset="UTF-8" />
+  <title>WayFare -Admin Panel-</title>
+   <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+   
+  <link rel="stylesheet" href="./styles/login.css" />
+</head>
+
+<body>
+
+  <!-- ============================================== -->
+  <!-- 1. ADMIN CONTROL PANEL -->
+  <!-- ============================================== -->
+  <div class="login-box">
+    <h1>Travel Tracker</h1>
+
+    <!-- Admin-only score reset -->
+    <form action="/clean" method="POST">
+      <button type="submit">Clean The Score Table</button>
+    </form>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 2. JS: Handle back button and refresh -->
+  <!-- ============================================== -->
+  <script>
+    
+    // Back button handler (e.g., go back from game/admin)
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted || performance.navigation.type === 2) {
+        window.location.href = "/";
+      }
+    });
+
+    // Refresh handler (F5 or hard refresh)
+    if (performance.navigation.type === 1) {
+      window.location.href = "/admin-login";
+    }
+  </script>
+
+</body>
+</html>

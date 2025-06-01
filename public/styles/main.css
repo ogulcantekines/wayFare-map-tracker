@@ -1,0 +1,368 @@
+/* ============================================== */
+/* 1. GLOBAL RESET & BOX SIZING */
+/* ============================================== */
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* ============================================== */
+/* 2. BODY STYLES */
+/* ============================================== */
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+body {
+  background: #dfdcb8;
+  color: #d3ddef;
+  font-family: 'Poppins', sans-serif;
+}
+
+/*closing caret*/
+h1, h2, h3, button,p {
+  user-select: none;
+  caret-color: transparent;
+}
+
+
+/* ============================================== */
+/* 3. MAP CONTAINER */
+/* ============================================== */
+.ag-canvas {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 3rem 1rem;
+  margin-top: -70px;
+  z-index: -1;
+  opacity: 1;
+  transition: opacity 0.5s;
+}
+
+.ag-canvas_svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  margin-left: 1rem;
+}
+
+.ag-canvas_svg path {
+  fill: #ffffff;
+  stroke: #7a1343;
+  stroke-width: 2;
+  transition: 0.5s;
+}
+
+/* ============================================== */
+/* 4. INPUT FORMS & BUTTONS */
+/* ============================================== */
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.inline-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.inline-form input {
+  padding: 12px 14px;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 14px;
+  color: #21252b;
+  background: #fff;
+  border: 3px solid #7a1343;
+  border-radius: 6px;
+  outline: none;
+  transition: 0.2s ease;
+}
+
+.inline-form input::placeholder {
+  color: #999;
+  letter-spacing: 0.5px;
+}
+
+.inline-form input:focus {
+  border-color: #7a1343;
+  box-shadow: 0 5px 10px #7a1343;
+  background-color: #fff;
+}
+
+button {
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  font-weight: bold;
+  background: #7a1343;
+  color: #fff;
+  border: 0;
+  padding: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.2s ease;
+}
+
+button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.1);
+}
+
+button:active {
+  transform: scale(0.87);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+#res-btn {
+  background-color: #0d7712;
+}
+
+/* ============================================== */
+/* 5. FIXED BOTTOM BUTTONS */
+/* ============================================== */
+.buttons {
+  position: absolute;
+  bottom: 80px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 9999;
+}
+
+#show-scores-btn,
+#logout-btn {
+  padding: 10px 14px;
+  font-size: 13px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+#show-scores-btn {
+  background-color: #7a1343;
+  color: white;
+}
+
+#logout-btn {
+  background-color: #2e2c2c;
+  color: white;
+}
+
+/* ============================================== */
+/* 6. TOTAL SCORE DISPLAY */
+/* ============================================== */
+.total-count {
+  color: black;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  padding: 15px;
+  font-size: 20px;
+}
+
+/* ============================================== */
+/* 7. ANIMATED COUNTRY POP EFFECT */
+/* ============================================== */
+.animated-country {
+  animation: highlight-pop 0.5s ease-out;
+  transform-origin: center;
+  fill: #7a1343 !important;
+}
+
+@keyframes highlight-pop {
+  0% { transform: scale(1); fill-opacity: 0.2; }
+  50% { transform: scale(1.05); fill-opacity: 0.9; }
+  100% { transform: scale(1); fill-opacity: 1; }
+}
+
+/* ============================================== */
+/* 8. TOAST ERROR MESSAGE */
+/* ============================================== */
+.toast {
+  pointer-events: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #7a1343;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-size: 15px;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInOut 3s forwards;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ============================================== */
+/* 9. USER INFO DISPLAY (Top Right) */
+/* ============================================== */
+.user-info {
+  position: absolute;
+  top: 5px;
+  right: 20px;
+  font-size: 10px;
+  color: #000000;
+  z-index: 999;
+}
+
+/* ============================================== */
+/* 10. RESPONSIVE DESIGN */
+/* ============================================== */
+@media screen and (max-width: 767px) {
+  .ag-canvas {
+    flex-flow: row wrap;
+    height: auto;
+    padding: 4rem 1rem 1rem;
+    margin-top: 150px;
+  }
+
+  .ag-canvas_svg {
+    max-height: calc(100% - 6rem);
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 550px) {
+  .ag-canvas {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+    width: 100%;
+    padding: 0.3rem;
+    margin-top: 20px;
+  }
+
+  .ag-canvas_svg {
+    width: 95%;
+    max-width: 400px;
+    margin: 1rem auto;
+    height: auto;
+  }
+
+  .form-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .inline-form {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+  .inline-form input {
+    width: 90%;
+    font-size: 16px;
+    padding: 12px;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .inline-form button {
+    width: 70%;
+    font-size: 16px;
+    padding: 8px;
+  }
+
+  #res-btn {
+    width: 35%;
+    padding: 8px;
+    font-size: 16px;
+  }
+
+  .buttons {
+    width: 20%;
+    position: absolute;
+    left: -15px;
+    flex-direction: column;
+    gap: 1px;
+  }
+
+  .total-count,
+  .user-info {
+    position: static;
+    text-align: center;
+    font-size: 12px;
+    padding: 4px;
+    margin: 4px auto 0;
+    border-radius: 5px;
+    width: fit-content;
+    flex-shrink: 0;
+  }
+}
+
+@media screen and (max-height: 800px) {
+  .ag-canvas {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 40%;
+    padding: 1rem;
+    margin-top: 20px;
+  }
+}
+
+/* ============================================== */
+/* 11. MODAL POPUP STYLES */
+/* ============================================== */
+.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(255, 255, 255, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  font-family: 'Poppins', sans-serif;
+}
+
+.modal-content {
+  background: #7a1343;
+  color: white;
+  text-align: center;
+  padding: 50px 100px;
+  border-radius: 10px;
+  min-width: 300px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+}
+
+.modal-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.modal-content .close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 26px;
+  color: black;
+  cursor: pointer;
+}

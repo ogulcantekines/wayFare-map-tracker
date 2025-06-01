@@ -1,0 +1,146 @@
+/* ============================================== */
+/* 1. GLOBAL RESET & PAGE LAYOUT */
+/* ============================================== */
+body {
+  background: #dfdcb8;
+  font-family: "Roboto", sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  color: #d3ddef;
+}
+
+h1, h2, h3, button,p,.login-box{
+  user-select: none;
+  caret-color: transparent;
+}
+input{
+  user-select: none;
+  caret-color: #21252b;
+}
+
+/* ============================================== */
+/* 2. LOGIN BOX STYLE */
+/* ============================================== */
+.login-box {
+  background-color: #ffffff;
+  padding: 40px;
+  border: 2px solid #7a1343;
+  border-radius: 12px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-box h1 {
+  color: #7a1343;
+  margin-bottom: 30px;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* ============================================== */
+/* 3. INPUT FIELD STYLES */
+/* ============================================== */
+.login-box input {
+  padding: 15px;
+  font-family: "Bebas Neue", sans-serif;
+  margin-bottom: 20px;
+  width: 80%;
+  font-size: 14px;
+  color: #21252b;
+  background-color: #ffffff;
+  border: 2px solid #7a1343;
+  border-radius: 6px;
+  outline: none;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.login-box input::placeholder {
+  color: #999;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+.login-box input:focus {
+  border-color: #7a1343;
+  box-shadow: 0 0 5px #7a1343;
+  background-color: #fff;
+}
+
+.login-box input:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3), 0 0 15px #7a1343;
+  filter: brightness(1.1);
+}
+
+/* ============================================== */
+/* 4. BUTTON STYLES */
+/* ============================================== */
+.login-box button {
+  font-family: 'Poppins', sans-serif;
+  text-transform: uppercase;
+  width: 50%;
+  outline: 0;
+  background: #7a1343;
+  border: 0;
+  padding: 16px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.login-box button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  filter: brightness(1.1);
+}
+
+.login-box button:active {
+  transform: scale(0.87);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+
+/* ============================================== */
+/* 5. TOAST ERROR MESSAGE */
+/* ============================================== */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #7a1343;
+  color: white;
+  padding: 14px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  animation: fadeInOut 3s forwards;
+  z-index: 9999;
+  font-family: 'Poppins', sans-serif;
+  font-size: 15px;
+}
+
+@keyframes fadeInOut {
+  0%   { opacity: 0; transform: translateY(-10px); }
+  10%  { opacity: 1; transform: translateY(0); }
+  90%  { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* ============================================== */
+/* 6. OPTIONAL: ANIMATED SVG POP */
+/* ============================================== */
+@keyframes highlight-pop {
+  0%   { transform: scale(1); fill-opacity: 0.2; }
+  50%  { transform: scale(1.05); fill-opacity: 0.9; }
+  100% { transform: scale(1); fill-opacity: 1; }
+}

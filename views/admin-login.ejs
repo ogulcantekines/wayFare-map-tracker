@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 1. META & STYLING -->
+  <meta charset="UTF-8" />
+  <title>WayFare -Admin Login-</title>
+   <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
+   
+  <link rel="stylesheet" href="./styles/login.css" />
+</head>
+
+<body>
+
+  <!-- ============================================== -->
+  <!-- 1. ADMIN LOGIN BOX -->
+  <!-- ============================================== -->
+  <div class="login-box">
+    <h1>HELLO ADMIN!</h1>
+
+    <!-- Admin password input form -->
+    <form action="/admin-login" method="POST" style="margin-top: 30px;">
+      <input type="password" name="adminPass" placeholder="Admin Password" required />
+      <button type="submit" id="admin-btn">SUBMIT</button>
+    </form>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- 2. ERROR MESSAGE (Toast) -->
+  <!-- ============================================== -->
+  <% if (typeof error !== "undefined" && error !== null) { %>
+    <div class="toast"><%= error %></div>
+  <% } %>
+
+  <!-- ============================================== -->
+  <!-- 3. SCRIPT: Clean Error + Back Navigation -->
+  <!-- ============================================== -->
+  <script>
+
+    // Remove ?error=2 from the URL after rendering
+    const url = new URL(window.location);
+    url.searchParams.delete("error");
+    window.history.replaceState({}, document.title, url);
+
+    // If back button is used, force redirect to home
+    window.addEventListener("pageshow", function (event) {
+      if (event.persisted || (window.performance && window.performance.navigation.type === 2)) {
+        window.location.href = "/";
+      }
+    });
+  </script>
+
+</body>
+</html>
