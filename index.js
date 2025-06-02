@@ -5,6 +5,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import pg from "pg";
+import session from "express-session";
 import dotenv from "dotenv";
 
 dotenv.config(); // Load environment variables
@@ -25,8 +26,6 @@ const port = process.env.PORT || 3000;
 // 2. GLOBAL STATE VARIABLES
 // ==============================================
 
-let currentUser = "";
-let currentHighScore = 0;
 let adminActive = false;
 const adminPassword = process.env.ADMIN_PASSWORD; //its password so that must be called from .env
 
@@ -34,6 +33,13 @@ const adminPassword = process.env.ADMIN_PASSWORD; //its password so that must be
 // 3. MIDDLEWARE
 // ==============================================
 
+app.use(
+  session({
+    secret: "wayfare-secret",
+    resave: false,
+    saveUninitialized: true,
+  })
+);
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -41,19 +47,21 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // 4. UTILITY FUNCTIONS
 // ==============================================
 
-async function checkVisisted() {
-  const result = await db.query("SELECT country_code FROM visited_countries");
-  return result.rows.map(row => row.country_code);
+async function checkVisited(username) {
+  const result = await db.query(
+    "SELECT country_code FROM countries_visited WHERE username = $1",
+    [username]
+  );
+  return result.rows.map((row) => row.country_code);
 }
 
 // ==============================================
 // 5. ROOT,LOGIN & AUTH ROUTES
 // ==============================================
 
-// Reset visited countries table on back navigation
 app.get("/", async (req, res) => {
   try {
-    await db.query("TRUNCATE TABLE visited_countries RESTART IDENTITY;");
+    await db.query("TRUNCATE TABLE countries_visited RESTART IDENTITY;");
     console.log("Countries reset via back button.");
   } catch (err) {
     console.error("Auto-reset failed:", err);
@@ -61,9 +69,8 @@ app.get("/", async (req, res) => {
   res.redirect("/login");
 });
 
-// Show login page
 app.get("/login", (req, res) => {
-  currentUser = ""; // Clear session user on every login load
+  req.session.user = null;
   const showError = req.query.error === "1";
 
   res.render("login.ejs", {
@@ -71,19 +78,17 @@ app.get("/login", (req, res) => {
   });
 });
 
-// Handle login submission
 app.post("/login", async (req, res) => {
-  const username = req.body.username.trim();
-  currentUser = username;
+  req.session.user = req.body.username.trim();
 
   try {
-    const result = await db.query("SELECT * FROM countries_user WHERE username = $1", [username]);
+    const result = await db.query("SELECT * FROM countries_user WHERE username = $1", [req.session.user]);
 
     if (result.rows.length === 0) {
-      await db.query("INSERT INTO countries_user (username, score) VALUES ($1, $2)", [username, 0]);
-      currentHighScore = 0;
+      await db.query("INSERT INTO countries_user (username, score) VALUES ($1, $2)", [req.session.user, 0]);
+      req.session.highScore = 0;
     } else {
-      currentHighScore = result.rows[0].score;
+      req.session.highScore = result.rows[0].score;
     }
     console.log("Game has been started successfully!");
     res.redirect("/game");
@@ -94,7 +99,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Handle logout
 app.get("/logout", (req, res) => {
   console.log("Logged out! See you next time")
   res.redirect("/login");
@@ -105,21 +109,25 @@ app.get("/logout", (req, res) => {
 // ==============================================
 
 app.get("/game", async (req, res) => {
-
-  if (currentUser === "") {
-    return res.redirect("/login");
-  }
-
-  const countries = await checkVisisted();
+  if (!req.session.user) return res.redirect("/login");
+  
+  const countries = await checkVisited(req.session.user);
   const last = req.query.last || null;
   const total = countries.length;
 
-  const result = await db.query("SELECT * FROM countries_user WHERE username = $1", [currentUser]);
+  const countriesTotal = 176;
+  const hasWon = total >= countriesTotal;
+
+  if(hasWon === true){
+    await db.query("DELETE FROM countries_visited WHERE username = $1", [req.session.user]);
+  }
+
+  const result = await db.query("SELECT * FROM countries_user WHERE username = $1", [req.session.user]);
   const dbScore = result.rows[0]?.score || 0;
 
   if (total > dbScore) {
-    currentHighScore = total;
-    await db.query("UPDATE countries_user SET score = $1 WHERE username = $2", [currentHighScore, currentUser]);
+    req.session.highScore = total;
+    await db.query("UPDATE countries_user SET score = $1 WHERE username = $2", [total, req.session.user]);
     console.log("High score updated!")
   }
 
@@ -131,14 +139,14 @@ app.get("/game", async (req, res) => {
     countries,
     total,
     error: null,
-    user: currentUser,
-    score: currentHighScore,
+    user: req.session.user,
+    score: req.session.highScore,
     lastCountry: last,
-    topScores: leaderboardResult.rows
+    topScores: leaderboardResult.rows,
+    hasWon: hasWon
   });
 });
 
-// Add a new country to visited list
 app.post("/add", async (req, res) => {
   const input = req.body["country"];
 
@@ -156,42 +164,43 @@ app.post("/add", async (req, res) => {
     const countryCode = result.rows[0].country_code;
 
     try {
-      await db.query("INSERT INTO visited_countries (country_code) VALUES ($1)", [countryCode]);
+      await db.query("INSERT INTO countries_visited (username,country_code) VALUES ($1,$2)", [req.session.user, countryCode]);
       res.redirect("/game?last=" + countryCode);
       console.log(countryCode + " Has been added!")
     } catch (err) {
       console.log(err);
-      const countries = await checkVisisted();
+      const countries = await checkVisited(req.session.user);
       res.render("index.ejs", {
         countries,
         total: countries.length,
         lastCountry: null,
-        user: currentUser,
-        score: currentHighScore,
+        user: req.session.user,
+        score: req.session.highScore,
         topScores,
+        hasWon:null,
         error: "Country has already been added, try again.",
       });
     }
 
   } catch (err) {
     console.log(err);
-    const countries = await checkVisisted();
+    const countries = await checkVisited(req.session.user);
     res.render("index.ejs", {
       countries,
       total: countries.length,
       lastCountry: null,
-      user: currentUser,
-      score: currentHighScore,
+      user: req.session.user,
+      score: req.session.highScore,
       topScores,
+      hasWon:null,
       error: "Country name does not exist, try again.",
     });
   }
 });
 
-// Reset only visited countries table
 app.post("/reset", async (req, res) => {
   try {
-    await db.query("TRUNCATE TABLE visited_countries RESTART IDENTITY;");
+    await db.query("DELETE FROM countries_visited WHERE username = $1", [req.session.user]);
     res.redirect("/game");
   } catch (err) {
     console.error("Reset Error:", err);
@@ -203,7 +212,6 @@ app.post("/reset", async (req, res) => {
 // 7. ADMIN ROUTES
 // ==============================================
 
-// Show admin login
 app.get("/admin-login", (req, res) => {
   const adminError = req.query.error === "2";
 
@@ -212,7 +220,6 @@ app.get("/admin-login", (req, res) => {
   });
 });
 
-// Handle admin login
 app.post("/admin-login", (req, res) => {
   const password = req.body.adminPass;
 
@@ -224,7 +231,6 @@ app.post("/admin-login", (req, res) => {
   }
 });
 
-// Show admin dashboard
 app.get("/admin", (req, res) => {
   if (adminActive === true) {
     res.render("admin.ejs", {});
@@ -234,8 +240,7 @@ app.get("/admin", (req, res) => {
   }
 });
 
-// Clear all users and their scores
-app.post("/clean", async (req, res) => {
+app.get("/clean", async (req, res) => {
   await db.query("TRUNCATE TABLE countries_user RESTART IDENTITY;");
   res.redirect("/login");
 });
